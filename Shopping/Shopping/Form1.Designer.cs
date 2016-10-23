@@ -1,4 +1,4 @@
-﻿namespace WindowsFormsApplication1
+﻿namespace Shopping
 {
     partial class Form1
     {
