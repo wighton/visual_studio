@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization.Json;
 using Newtonsoft.Json;
 using CsvHelper;
-using System.Diagnostics;
 
 namespace Convert_Console
 {
@@ -15,49 +9,58 @@ namespace Convert_Console
     {
         static void Main(string[] args)
         {
-            Importer contentObject = ReadContentFromFile();
-            SaveJsonObjectFile(contentObject);
-        }
 
-        private static Importer ReadContentFromFile()
-        {
-            // Build importer object to match scheme
-            Importer importer = new Importer();
-            importer.settings = new Settings();
-            importer.accounts = new List<Account>();
-
-            // Read the file and populate object
+            // File bulk import file, read in to system and parse via Csv Reader.
             var readContentFilePath = @"C:\Users\stuart.wighton\Downloads\Rollout_2.csv";
-            StreamReader streamReader = new StreamReader(readContentFilePath);
-            var csvReader = new CsvReader(streamReader);
-            int count = 0;
-            while (csvReader.Read())
+            try
             {
-                importer.accounts.Add(new Account
+                StreamReader streamReader = new StreamReader(readContentFilePath);
+                var parsedImportFile = new CsvReader(streamReader);
+
+                // Intiate bulkUpload object and populate with parsed file data.
+                Importer bulkUpload = new Importer();
+                int count = 1;
+                while (parsedImportFile.Read())
                 {
-                    UID = "UID " + count,
-                    email = csvReader.GetField<string>(5),
-                    profile = new Profile
+                    bulkUpload.accounts.Add(new Account
                     {
-                        firstName = csvReader.GetField<string>(3),
-                        lastName = csvReader.GetField<string>(4)
-                    }
-                });
-                count++;
+                        UID = "UID" + count,
+                        email = parsedImportFile.GetField<string>(5),
+                        profile = new Profile
+                        {
+                            firstName = parsedImportFile.GetField<string>(3),
+                            lastName = parsedImportFile.GetField<string>(4)
+                        }
+
+                    });
+                    bulkUpload.settings.totalRecords = count;
+                    count++;
+                } // End of parsed file read.
+
+                //Converts to JSON from the bulkUpload object and outputs to json file.
+                var json = JsonConvert.SerializeObject(bulkUpload, Formatting.Indented);
+                var destinationPath = @"C:\Users\stuart.wighton\Downloads\Nordic_Test2.json";
+                File.WriteAllText(destinationPath, json);
+
+                //Debug to display content on console
+                Console.WriteLine(json);
+                Console.ReadLine();
+
             }
-            return importer;
-        }
 
-        private static void SaveJsonObjectFile(Importer contentObject)
-        {
-            //Converts to JSON from the streaming object and outputs to file.
-            var json = JsonConvert.SerializeObject(contentObject, Formatting.Indented);
-            var destinationPath = @"C:\Users\stuart.wighton\Downloads\Nordic_Test2.json";
-            File.WriteAllText(destinationPath, json);
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.ReadLine();
+            }
 
-            //Debug to display content on console
-            Console.WriteLine(json);
-            Console.ReadLine();
+            catch (Exception e)
+            {
+                Console.WriteLine("Unknown problem stopped json file being created.");
+                Console.WriteLine("");
+                Console.WriteLine(e.Message);
+                Console.ReadLine();
+            }
         }
     }
 }
