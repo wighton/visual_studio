@@ -54,8 +54,6 @@
   <ItemGroup>
     <Compile Include="Account.cs" />
     <Compile Include="Importer.cs" />
-    <Compile Include="Person.cs" />
-    <Compile Include="Profile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />

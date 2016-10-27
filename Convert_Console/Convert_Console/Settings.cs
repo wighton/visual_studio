@@ -17,6 +17,7 @@ namespace Convert_Console
         public Settings()
         {
             importFormat = "gigya-­raas-­import";
+            apiKey = "TBC";
             finalizeRegistration = true;
             skipVerification = true;
         }
