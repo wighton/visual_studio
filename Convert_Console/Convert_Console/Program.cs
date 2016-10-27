@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization.Json;
 using Newtonsoft.Json;
+using CsvHelper;
+using System.Diagnostics;
 
 namespace Convert_Console
 {
@@ -13,87 +15,49 @@ namespace Convert_Console
     {
         static void Main(string[] args)
         {
-            //Account account = new Account();
+            Importer contentObject = ReadContentFromFile();
+            SaveJsonObjectFile(contentObject);
+        }
 
-            //account.UID = "StringUIDSting";
-            //account.HashedPassword = "StringhashedPasswordString";
-            //account.PwHashAlgorithm = "StringpwHashAlgorithmString";
-            //account.Email = "test@someithng.com";
-            //account.Profile.FirstName = "testFirstName";
-            //account.Profile.LastName = "testLastName";
+        private static Importer ReadContentFromFile()
+        {
+            // Build importer object to match scheme
+            Importer importer = new Importer();
+            importer.settings = new Settings();
+            importer.accounts = new List<Account>();
 
-            //Importer importer = new Importer();
-            //importer.accounts.UID = "";
-            //importer.accounts.hashedPassword = "StringhashedPasswordString";
-            //importer.accounts.pwHashAlgorithm = "StringpwHashAlgorithmString";
-            //importer.accounts.email = "test@someithng.com";
-            //importer.accounts.Profile.firstName = "testFirstName";
-            //importer.accounts.Profile.lastName = "testLastName";
-
-            Importer importer = new Importer
+            // Read the file and populate object
+            var readContentFilePath = @"C:\Users\stuart.wighton\Downloads\Rollout_2.csv";
+            StreamReader streamReader = new StreamReader(readContentFilePath);
+            var csvReader = new CsvReader(streamReader);
+            int count = 0;
+            while (csvReader.Read())
             {
-                settings = new Settings { },
-                accounts = new List<Account>()
+                importer.accounts.Add(new Account
                 {
-                    new Account {
-                        UID = "UID 1",
-                        hashedPassword = "StringhashedPasswordString",
-                        pwHashAlgorithm = "StringpwHashAlgorithmString",
-                        email = "test@someithng.com",
-                        profile = new Profile
-                        {
-                            firstName = "testFirstName",
-                            lastName = "testLastName"
-                        }
-                    },
-                    new Account {
-                        UID = "UID 2",
-                        hashedPassword = "StringhashedPasswordString",
-                        pwHashAlgorithm = "StringpwHashAlgorithmString",
-                        email = "test@someithng.com",
-                        profile = new Profile
-                        {
-                            firstName = "testFirstName",
-                            lastName = "testLastName"
-                        }
+                    UID = "UID " + count,
+                    email = csvReader.GetField<string>(5),
+                    profile = new Profile
+                    {
+                        firstName = csvReader.GetField<string>(3),
+                        lastName = csvReader.GetField<string>(4)
                     }
-                }
+                });
+                count++;
+            }
+            return importer;
+        }
 
-
-                //account2 = new Account
-                //{
-                //    UID = "UID 2",
-                //    hashedPassword = "2 StringhashedPasswordString",
-                //    pwHashAlgorithm = "2 StringpwHashAlgorithmString",
-                //    email = "2_test@someithng.com",
-                //    profile = new Profile
-                //    {
-                //        firstName = "2 testFirstName",
-                //        lastName = "2 testLastName"
-                //    }
-                //}
-            };
-
-
-            MemoryStream stream1 = new MemoryStream();
-            DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(Importer));
-            ser.WriteObject(stream1, importer);
-
-            stream1.Position = 0;
-            StreamReader sr = new StreamReader(stream1);
-            Console.Write("JSON form of Person object: ");
-            Console.WriteLine(sr.ReadToEnd());
-
-            //Generates JSON from the LINQ query
-            var json = JsonConvert.SerializeObject(importer, Formatting.Indented);
+        private static void SaveJsonObjectFile(Importer contentObject)
+        {
+            //Converts to JSON from the streaming object and outputs to file.
+            var json = JsonConvert.SerializeObject(contentObject, Formatting.Indented);
             var destinationPath = @"C:\Users\stuart.wighton\Downloads\Nordic_Test2.json";
-
-            //Write the file to the destination path    
             File.WriteAllText(destinationPath, json);
 
-
+            //Debug to display content on console
+            Console.WriteLine(json);
             Console.ReadLine();
-
         }
     }
 }
