@@ -2,7 +2,7 @@
 {
     public class Account
     {
-        public string UID { get; set; }
+        public string siteUID { get; set; }
         public string email { get; set; }
         public Profile profile { get; set; }
         public Password password { get; set; }
