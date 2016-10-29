@@ -9,8 +9,8 @@ namespace Convert_Console
 
         public Importer()
         {
-            settings = new Settings();
-            accounts = new List<Account>();
+            this.settings = new Settings();
+            this.accounts = new List<Account>();
 
         }
     }

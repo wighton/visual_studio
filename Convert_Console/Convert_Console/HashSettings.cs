@@ -12,7 +12,7 @@ namespace Convert_Console
 
         public HashSettings()
         {
-            algorithm = "sha512";
+            this.algorithm = "sha512";
         }
     }
 }

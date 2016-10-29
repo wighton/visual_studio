@@ -1,4 +1,6 @@
-﻿namespace Convert_Console
+﻿using System.Configuration;
+
+namespace Convert_Console
 {
     public class Settings
     {
@@ -10,10 +12,11 @@
 
         public Settings()
         {
-            importFormat = "gigya-­raas-­import";
-            apiKey = "TBC";
-            finalizeRegistration = true;
-            skipVerification = true;
+
+            this.importFormat = "gigya-­raas-­import";
+            this.apiKey = ConfigurationManager.AppSettings["apiKey"];
+            this.finalizeRegistration = true;
+            this.skipVerification = true;
         }
     }
 }
